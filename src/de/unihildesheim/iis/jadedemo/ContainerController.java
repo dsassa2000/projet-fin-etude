@@ -28,6 +28,9 @@ public class ContainerController {
     AgentController agentTwo = mainContainer
         .createNewAgent("AgentTwo", AgentTwo.class.getName(), new Object[0]);
     agentTwo.start();
+    AgentController agentThree = mainContainer
+            .createNewAgent("AgentThree", AgentThree.class.getName(), new Object[0]);
+    agentThree.start();
   }
 
   public static void main(String[] args) {

@@ -9,6 +9,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import de.unihildesheim.iis.jadedemo.graph.Graph;
+
 /**
  * Jade Agent template
  *
@@ -22,50 +24,25 @@ public class AgentOne extends Agent {
     // Define the behaviour
     CyclicBehaviour loop = new CyclicBehaviour(this) {
       private static final long serialVersionUID = 1L;
-
+      String filename = "le450_15b.col";
       @Override
       public void action() {
-
         // Receive the incoming message
         ACLMessage aclMsg = receive();
-
         // Interpret the message
-        if (aclMsg != null) {
-          // do something
-          System.out
-              .println(myAgent.getLocalName() + "> Received message from: " + aclMsg.getSender());
-          System.out.println("Received solution: " + aclMsg.getContent());
-        }
-
-        System.out.println("Enter the task:");
-        // Read the task from command line
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String in;
-        try {
-          in = reader.readLine();
-          if (!in.equals("stop")) {
-            System.out.println("Assigning task ...");
-            ACLMessage newMsg = new ACLMessage(ACLMessage.REQUEST);
-            newMsg.addReceiver(new AID("AgentTwo", AID.ISLOCALNAME));
-            newMsg.setContent(in);
+        //if (aclMsg != null) {
+        	ACLMessage newMsg = new ACLMessage(ACLMessage.INFORM);
+            newMsg.addReceiver(new AID("AgentThree", AID.ISLOCALNAME));
+            try {
+            	Graph graph = new Graph(filename);
+                System.out.println("DOHA : "+graph);
+				newMsg.setContentObject(graph);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             send(newMsg);
-          } else {
-            System.out.println("Stopping ...");
-            // Shut down main container
-            Thread stopContainer = new Thread(() -> {
-              try {
-                getContainerController().kill();
-              } catch (StaleProxyException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-              }
-            });
-            stopContainer.start();
-          }
-        } catch (IOException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
+       // }       
         block(); // Stop the behaviour until next message is received
       }
     };

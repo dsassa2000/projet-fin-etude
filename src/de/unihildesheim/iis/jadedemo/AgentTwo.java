@@ -1,5 +1,10 @@
 package de.unihildesheim.iis.jadedemo;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Scanner;
+
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -33,5 +38,34 @@ public class AgentTwo extends Agent {
       }
     };
     addBehaviour(loop);
+    
+ // Start a server to listen for Python messages
+    startServer();
+  }
+  private void startServer() {
+      new Thread(() -> {
+          try {
+              ServerSocket serverSocket = new ServerSocket(9876);
+              System.out.println("Java Server listening on port 9876");
+
+              while (true) {
+                  Socket socket = serverSocket.accept();
+                  Scanner scanner = new Scanner(socket.getInputStream());
+
+                  while (scanner.hasNextLine()) {
+                      String message = scanner.nextLine();
+                      ACLMessage aclMessage = new ACLMessage(ACLMessage.INFORM);
+                      aclMessage.setContent(message);
+                      aclMessage.addReceiver(getAID());
+                      send(aclMessage);
+                  }
+
+                  scanner.close();
+                  socket.close();
+              }
+          } catch (IOException e) {
+              e.printStackTrace();
+          }
+      }).start();
   }
 }
